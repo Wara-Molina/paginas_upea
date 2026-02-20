@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkupea_carreras"]=self["webpackChunkupea_carreras"]||[]).push([[576],{4609:function(e,a,r){r.r(a);const s={},u=s;a["default"]=u}}]);
+//# sourceMappingURL=576.d43dbf14.js.map

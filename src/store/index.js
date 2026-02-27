@@ -1,39 +1,63 @@
 import { createStore } from 'vuex'
 
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('myTotallySecretKey');
-
 export default createStore({
   state: {
-    url_api: process.env.VUE_APP_ROOT_API,
+    url_api: process.env.VUE_APP_ROOT_API || 'https://servicioadministrador.upea.bo',
     getter: true,
     MenuConv: [],
     MenuCur: [],
     Links: [],
     Institucion: {},
     statusImg: true,
-
   },
-  getters: {
-  },
+  
+  getters: {},
+  
   mutations: {
     loadOn() {
       document.querySelector("#preloader").style.visibility = "visible";
       window.scrollTo(0, 0);
     },
+    
     loading() {
       document.querySelector("#preloader").style.visibility = "hidden";
     },
+    
+    setInstitucion(state, data) {
+      state.Institucion = data
+    },
+    
+    setLinks(state, data) {
+      state.Links = data
+    },
+    
+    setGetter(state, value) {
+      state.getter = value
+    },
+    
     clickLink(state) {
       window.scrollTo(0, 0);
       state.getter = true
     },
+    
     idEncrypt() {
-      console.log(cryptr.encrypt("hola"))
-    }
+      console.log("hola")
+    },
+     setMenuConv(state, data) {
+    state.MenuConv = data
   },
-  actions: {
+
+  loadOff() {
+    document.querySelector("#preloader").style.visibility = "hidden";
   },
-  modules: {
+  
+  setMenuCur(state, data) {
+    state.MenuCur = data
   }
+
+
+  },
+  
+  actions: {},
+  modules: {}
 })

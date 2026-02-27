@@ -9,8 +9,7 @@
             @click="$store.commit('clickLink')"
           >
             <i class="fa fa-angle-right"></i>
-            {{ conv.tipo_conv_comun_titulo[0].toUpperCase()
-            }}{{ conv.tipo_conv_comun_titulo.substr(1).toLowerCase() }}
+            {{ conv.tipo_conv_comun_titulo?.charAt(0).toUpperCase() }}{{ conv.tipo_conv_comun_titulo?.slice(1).toLowerCase() }}
           </router-link>
         </li>
         

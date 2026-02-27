@@ -1,11 +1,14 @@
 <template>
   <div>
+
     <div class="page-title-area bg-overlay bg-overlay-img banner-img">
       <div class="container">
         <div class="row">
           <div class="col-xl-7 col-lg-8">
             <div class="breadcrumb-inner">
-              <h2 class="page-title" style="color: #fff !important;">PUBLICACIONES ACTUALES DE LA CARRERA</h2>
+              <h2 class="page-title" style="color: #fff !important;">
+                PUBLICACIONES ACTUALES DE LA CARRERA
+              </h2>
               <ul class="page-list">
                 <li>
                   <router-link to="/">INICIO</router-link>
@@ -21,20 +24,26 @@
     <div class="blog-area pd-top-120 pd-bottom-120">
       <div class="container">
         <div class="row">
+          
           <div class="col-lg-8 col-12">
             <div v-if="searchGet">
-              <div v-if="searchValues.length == 0">
-                <h3>No se encontraron resultados</h3>
+              
+              <div v-if="searchValues.length === 0" class="text-center">
+                <h3>⚠️ No se encontraron resultados para "{{ search }}"</h3>
+                <button class="btn btn-base mt-3" @click="limpiarBusqueda">
+                  Mostrar todas las publicaciones
+                </button>
               </div>
+              
               <div v-else class="row justify-content-center">
                 <div class="col-12">
-                  <p>{{ searchValues.length }} resultados</p>
+                  <p>{{ searchValues.length }} resultado(s) encontrado(s)</p>
                   <hr />
                 </div>
                 <div
                   class="single-blog-inner col-12 col-lg-6"
-                  v-for="(pub, id_pub) of searchValues"
-                  :key="id_pub"
+                  v-for="(pub, index) of searchValues"
+                  :key="pub.publicaciones_id || index"
                 >
                   <div class="thumb">
                     <router-link
@@ -42,10 +51,9 @@
                       @click="$store.commit('clickLink')"
                     >
                       <img
-                        :src="
-                          url_api + '/Publicaciones/' + pub.publicaciones_imagen
-                        "
-                        alt="img"
+                        :src="imageUrl + pub.publicaciones_imagen"
+                        :alt="pub.publicaciones_titulo"
+                        loading="lazy"
                       />
                     </router-link>
                   </div>
@@ -57,7 +65,8 @@
                           Por <span>{{ pub.publicaciones_autor }}</span>
                         </li>
                         <li class="date">
-                          {{ dmy(pub.publicaciones_fecha) }}
+                          <i class="fa fa-calendar"></i>
+                          {{ formatearFecha(pub.publicaciones_fecha) }}
                         </li>
                       </ul>
                     </div>
@@ -69,104 +78,115 @@
                         {{ pub.publicaciones_titulo }}
                       </router-link>
                     </h4>
-                    <!-- <p v-html="conv.con_descripcion"></p> -->
                     <router-link
-                      :to="'/detallePublicacion/' + pub.idPublicaciones"
+                      :to="'/detallePublicacion/' + pub.publicaciones_id"
                       @click="$store.commit('clickLink')"
                       class="readmore-text"
                     >
-                      Leer mas
+                      Leer más
                     </router-link>
                   </div>
                 </div>
               </div>
             </div>
+
+
             <div v-else class="row justify-content-center">
-              <div v-if="Publicaciones.length == 0">
-                <h2>SIN PUBLICACIONES</h2>
+              <div v-if="publicaciones.length === 0" class="col-12 text-center">
+                <h2>Sin publicaciones disponibles</h2>
+                <p class="text-muted">Pronto se agregarán nuevas publicaciones.</p>
               </div>
-              <div
-                v-else
-                class="single-blog-inner col-12 col-lg-6"
-                v-for="(pub, id_pub) of Publicaciones"
-                :key="id_pub"
-              >
-                <div class="thumb">
-                  <router-link
-                    :to="'/detallePublicacion/' + pub.publicaciones_id"
-                    @click="$store.commit('clickLink')"
-                  >
-                    <img
-                      :src="
-                        url_api + '/Publicaciones/' + pub.publicaciones_imagen
-                      "
-                      alt="img"
-                    />
-                  </router-link>
-                </div>
-                <div class="details">
-                  <div class="blog-meta">
-                    <ul>
-                      <li class="comnt bg-base">PUBLICACIONES</li>
-                      <li class="author">
-                        Por <span>{{ pub.publicaciones_autor }}</span>
-                      </li>
-                      <li class="date">
-                        {{ dmy(pub.publicaciones_fecha) }}
-                      </li>
-                    </ul>
-                  </div>
-                  <h4>
+              
+
+              <template v-else>
+                <div
+                  class="single-blog-inner col-12 col-lg-6"
+                  v-for="(pub, index) of publicaciones"
+                  :key="pub.publicaciones_id || index"
+                  v-show="
+                    (pag - 1) * NUM_RESULTS <= index &&
+                    pag * NUM_RESULTS > index
+                  "
+                >
+                  <div class="thumb">
                     <router-link
                       :to="'/detallePublicacion/' + pub.publicaciones_id"
                       @click="$store.commit('clickLink')"
                     >
-                      {{ pub.publicaciones_titulo }}
+                      <img
+                        :src="imageUrl + pub.publicaciones_imagen"
+                        :alt="pub.publicaciones_titulo"
+                        loading="lazy"
+                      />
                     </router-link>
-                  </h4>
-                  <!-- <p v-html="conv.con_descripcion"></p> -->
-                  <router-link
-                    :to="'/detallePublicacion/' + pub.publicaciones_id"
-                    @click="$store.commit('clickLink')"
-                    class="readmore-text"
-                  >
-                    Leer mas
-                  </router-link>
+                  </div>
+                  <div class="details">
+                    <div class="blog-meta">
+                      <ul>
+                        <li class="comnt bg-base">PUBLICACIONES</li>
+                        <li class="author">
+                          Por <span>{{ pub.publicaciones_autor }}</span>
+                        </li>
+                        <li class="date">
+                          <i class="fa fa-calendar"></i>
+                          {{ formatearFecha(pub.publicaciones_fecha) }}
+                        </li>
+                      </ul>
+                    </div>
+                    <h4>
+                      <router-link
+                        :to="'/detallePublicacion/' + pub.publicaciones_id"
+                        @click="$store.commit('clickLink')"
+                      >
+                        {{ pub.publicaciones_titulo }}
+                      </router-link>
+                    </h4>
+                    <router-link
+                      :to="'/detallePublicacion/' + pub.publicaciones_id"
+                      @click="$store.commit('clickLink')"
+                      class="readmore-text"
+                    >
+                      Leer más
+                    </router-link>
+                  </div>
                 </div>
-              </div>
-              <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0">
-                <ul class="pagination">
-                  <li class="pagination-arrow disable">
-                    <a
-                      href="#"
-                      aria-label="Previous"
-                      @click.prevent="pag != 1 ? (pag -= 1) : ''"
-                    >
-                      <i class="fa fa-angle-double-left"></i>
-                    </a>
-                  </li>
-                  <li v-for="(i, index) of pager" :key="index">
-                    <a
-                      href="#"
-                      :class="[i == pag ? 'active' : '']"
-                      @click.prevent="pag = i"
-                    >
-                      {{ i }}
-                    </a>
-                  </li>
-                  <li class="pagination-arrow">
-                    <a
-                      href="#"
-                      aria-label="Next"
-                      @click.prevent="pag != pager ? (pag += 1) : ''"
-                      ><i class="fa fa-angle-double-right"></i
-                    ></a>
-                  </li>
-                </ul>
-              </nav>
+                
+                <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
+                  <ul class="pagination">
+                    <li class="pagination-arrow disable">
+                      <a
+                        href="#"
+                        aria-label="Previous"
+                        @click.prevent="pag > 1 ? pag-- : null"
+                      >
+                        <i class="fa fa-angle-double-left"></i>
+                      </a>
+                    </li>
+                    <li v-for="(i, index) of pager" :key="index">
+                      <a
+                        href="#"
+                        :class="[i === pag ? 'active' : '']"
+                        @click.prevent="pag = i"
+                      >
+                        {{ i }}
+                      </a>
+                    </li>
+                    <li class="pagination-arrow">
+                      <a
+                        href="#"
+                        aria-label="Next"
+                        @click.prevent="pag < pager ? pag++ : null"
+                      >
+                        <i class="fa fa-angle-double-right"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </template>
             </div>
+            
           </div>
-          <!-- sidebar -->
+
           <div class="col-lg-4 col-12">
             <div class="td-sidebar">
               <div class="widget widget_search">
@@ -174,23 +194,25 @@
                   <div class="form-group">
                     <input
                       type="text"
-                      placeholder="Buscar publicacion"
+                      placeholder="Buscar publicación"
                       v-model="search"
-                      @keyup="buscar()"
+                      @keyup.enter="buscar"
                     />
                   </div>
-                  <button class="submit-btn" @click="buscar()">
+                  <button class="submit-btn" @click="buscar" type="button">
                     <i class="fa fa-search"></i>
                   </button>
                 </div>
               </div>
+              
               <SidebarCustom></SidebarCustom>
             </div>
           </div>
-          <!-- /.sidebar -->
+          
         </div>
       </div>
     </div>
+    
   </div>
 </template>
 
@@ -198,102 +220,203 @@
 .bg-overlay-img {
   background-image: url("@/assets/Fondo2.jpg");
 }
+
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.search-form input:focus {
+  outline: none;
+  border-color: var(--main-color-1, #007bff);
+}
+
+.submit-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--main-color-1, #007bff);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: var(--main-color-2, #0056b3);
+}
+
+.single-blog-inner img {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 4px;
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.single-blog-inner img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.text-center h2,
+.text-center h3 {
+  color: #666;
+  padding: 2rem;
+}
+
+.text-muted {
+  color: #999;
+}
+
+.blog-meta .date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 </style>
 
 <script>
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
+import api from '@/plugins/axios' 
+
 export default {
   name: "PublicacionesView",
-  data() {
-    return {
-      Publicaciones: [],
-      search: "",
-      searchGet: false,
-      searchValues: [],
-
-      NUM_RESULTS: 4,
-      pag: 1,
-      pager: 0,
-    };
-  },
+  
   components: {
     SidebarCustom,
   },
-  computed: {
-    ...mapState(["url_api", "getter"]),
+  
+  data() {
+    return {
+      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      publicaciones: [],
+      search: "",
+      searchGet: false,
+      searchValues: [],
+      NUM_RESULTS: 4,
+      pag: 1,
+      pager: 0,
+      loading: false
+    };
   },
+  
+  computed: {
+    ...mapState(["url_api", "Institucion"]),
+    
+    imageUrl() {
+      return process.env.VUE_APP_UPLOADS_URL || 'https://servicioadministrador.upea.bo/uploads/'
+    }
+  },
+
   methods: {
     async getPublicaciones() {
+      this.loading = true
       try {
-        let res = await this.axios.get(
-          "/api/PublicacionesAll/" + process.env.VUE_APP_ID_INSTITUCION
-        );
-        this.Publicaciones = res.data;
-        this.pager = this.Publicaciones.length / this.NUM_RESULTS;
-        if (this.pager - Math.trunc(this.pager) > 0) {
-          this.pager = Math.trunc(this.pager) + 1;
-        }
-        this.$store.commit("loading");
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    clickBack() {
-      this.$store.commit("clickLink");
-      this.$router.go(-1);
-    },
-    dmy(fecha) {
-      const meses = [
-        "enero",
-        "febrero",
-        "marzo",
-        "abril",
-        "mayo",
-        "junio",
-        "julio",
-        "agosto",
-        "septiembre",
-        "octubre",
-        "noviembre",
-        "diciembre",
-      ];
-      let fechaCadena = fecha.substr(0, 10);
-      let fechaArray = fechaCadena.split("-");
-      return (
-        fechaArray[2] +
-        " de " +
-        meses[fechaArray[1] - 1] +
-        " de " +
-        fechaArray[0]
-      );
-    },
-    buscar() {
-      if (this.search != "") {
-        this.searchGet = true;
+        const res = await api.get(`/institucion/${this.idInstitucion}/recursos`)
+        const data = res.data
 
-        this.searchValues = [];
-        this.Publicaciones.forEach((pub) => {
-          if (
-            pub.publicaciones_titulo
-              .toUpperCase()
-              .includes(this.search.toUpperCase())
-          ) {
-            this.searchValues.push(pub);
-          }
-        });
-      } else {
-        this.searchGet = false;
+        this.publicaciones = (data.upea_publicaciones || []).map(this._limpiarObjeto)
+        this._actualizarPager()
+        
+      } catch (error) {
+        console.error('Error cargando publicaciones:', error)
+        this.publicaciones = []
+      } finally {
+        this.loading = false
+        this.$store.commit("loading")
       }
     },
+
+    _actualizarPager() {
+      const total = this.publicaciones?.length || 0
+      this.pager = Math.ceil(total / this.NUM_RESULTS)
+      if (this.pag > this.pager && this.pager > 0) {
+        this.pag = this.pager
+      }
+    },
+
+    buscar() {
+      const query = this.search.trim().toUpperCase()
+      
+      if (query) {
+        this.searchGet = true
+        this.searchValues = this.publicaciones.filter(pub => 
+          pub.publicaciones_titulo?.toUpperCase().includes(query) ||
+          pub.publicaciones_autor?.toUpperCase().includes(query) ||
+          pub.publicaciones_descripcion?.toUpperCase().includes(query)
+        )
+
+        this.pag = 1
+      } else {
+        this.limpiarBusqueda()
+      }
+    },
+
+    limpiarBusqueda() {
+      this.search = ""
+      this.searchGet = false
+      this.searchValues = []
+      this.pag = 1
+    },
+
+    formatearFecha(fecha) {
+      if (!fecha) return ''
+      if (typeof fecha === 'string' && fecha.includes('de')) return fecha
+      
+      const meses = [
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+      ]
+      
+      let fechaObj
+      if (fecha.includes('T')) {
+        fechaObj = new Date(fecha)
+      } else {
+        const partes = fecha.substr(0, 10).split("-")
+        fechaObj = new Date(partes[0], parseInt(partes[1]) - 1, partes[2])
+      }
+      
+      if (isNaN(fechaObj.getTime())) return fecha
+      
+      return `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`
+    },
+
+    _limpiarObjeto(obj) {
+      if (!obj || typeof obj !== 'object') return obj
+      const cleaned = { ...obj }
+      Object.keys(cleaned).forEach(key => {
+        if (typeof cleaned[key] === 'string') {
+          cleaned[key] = cleaned[key].trim()
+        } else if (cleaned[key] && typeof cleaned[key] === 'object' && !Array.isArray(cleaned[key])) {
+          cleaned[key] = this._limpiarObjeto(cleaned[key])
+        }
+      })
+      return cleaned
+    },
+
+    clickBack() {
+      this.$store.commit("clickLink")
+      this.$router.go(-1)
+    }
   },
-  mounted() {
-    this.$store.commit("loadOn");
-    this.getPublicaciones();
-  },
+
   created() {
-    this.$store.commit("loadOn");
-    this.getPublicaciones();
+    this.$store.commit("loadOn")
+    this.getPublicaciones()
   },
+
+  beforeUnmount() {
+    this.limpiarBusqueda()
+  }
 };
 </script>

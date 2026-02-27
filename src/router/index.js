@@ -98,11 +98,11 @@ const routes = [
         name: 'investigacionView',
         component: () => import('@/views/Investigacion/InvestigacionView.vue')
       },
-      {
-        path: '/DetalleGaceta/:idGac',
-        name: 'detalleGaceta',
-        component: () => import('@/views/Gaceta/DetalleGaceta.vue')
-      },
+      // {
+      //   path: '/DetalleGaceta/:idGac',
+      //   name: 'detalleGaceta',
+      //   component: () => import('@/views/Gaceta/DetalleGaceta.vue')
+      // },
       {
         path: '/about',
         name: 'aboutView',

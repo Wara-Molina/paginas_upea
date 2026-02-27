@@ -6,7 +6,7 @@
           <div class="col-lg-8">
             <div class="breadcrumb-inner">
               <h2 class="page-title" style="color: #fff !important;">
-                {{ curso.det_titulo || 'Detalle de Curso' }}
+                {{ seminario.det_titulo || 'Detalle de Seminario' }}
               </h2>
               <ul class="page-list">
                 <li>
@@ -14,10 +14,10 @@
                 </li>
                 <li>
                   <a style="cursor: pointer" @click="clickBack">
-                    {{ curso.tipo_curso_otro?.tipo_conv_curso_nombre || 'CURSOS' }}
+                    {{ seminario.tipo_curso_otro?.tipo_conv_curso_nombre || 'SEMINARIOS' }}
                   </a>
                 </li>
-                <li>{{ curso.det_titulo || 'Curso' }}</li>
+                <li>{{ seminario.det_titulo || 'Seminario' }}</li>
               </ul>
             </div>
           </div>
@@ -29,66 +29,70 @@
       <div class="container">
         <div class="row justify-content-center">
 
+          <!-- Error: Seminario no encontrado -->
           <div class="col-lg-8 col-12" v-if="errorGet">
             <div class="text-center">
-              <h1>Curso inexistente</h1>
-              <p>El curso que buscas no está disponible o fue eliminado.</p>
+              <h1>Seminario inexistente</h1>
+              <p>El seminario que buscas no está disponible o fue eliminado.</p>
               <button class="btn btn-base mt-3" @click="clickBack">
-                <i class="fa fa-arrow-left"></i> Volver a Cursos
+                <i class="fa fa-arrow-left"></i> Volver a Seminarios
               </button>
             </div>
           </div>
 
+          <!-- Loading -->
           <div class="col-lg-8 col-12" v-else-if="loading">
             <div class="text-center">
               <div class="spinner-border text-primary" role="status">
                 <span class="sr-only">Cargando...</span>
               </div>
-              <p class="mt-3">Cargando información del curso...</p>
+              <p class="mt-3">Cargando información del seminario...</p>
             </div>
           </div>
 
-          <div class="col-lg-8 col-12" v-else-if="curso.iddetalle_cursos_academicos">
+          <!-- Contenido del seminario -->
+          <div class="col-lg-8 col-12" v-else-if="seminario.iddetalle_cursos_academicos">
             <div class="course-details-page">
 
+              <!-- Meta información -->
               <div class="course-details-meta-list">
                 <div class="row">
                   <div class="col-12 mt-4 mt-md-0">
                     <div class="row">
                       <div class="col-4 align-self-center">
-                        <h6>{{ curso.det_costo }} Bs</h6>
+                        <h6>{{ seminario.det_costo }} Bs</h6>
                         <span>Costo general</span>
                       </div>
                       <div class="col-4 align-self-center">
-                        <h6>{{ curso.det_costo_profe }} Bs</h6>
+                        <h6>{{ seminario.det_costo_profe }} Bs</h6>
                         <span>Costo profesional</span>
                       </div>
                       <div class="col-4 align-self-center">
-                        <h6>{{ curso.det_costo_ext }} Bs</h6>
+                        <h6>{{ seminario.det_costo_ext }} Bs</h6>
                         <span>Costo exterior</span>
                       </div>
                       <div class="col-4 align-self-center">
-                        <h6>{{ formatearFecha(curso.det_fecha_ini) }}</h6>
+                        <h6>{{ formatearFecha(seminario.det_fecha_ini) }}</h6>
                         <span>Fecha inicio</span>
                       </div>
                       <div class="col-4 align-self-center">
-                        <h6>{{ formatearFecha(curso.det_fecha_fin) }}</h6>
+                        <h6>{{ formatearFecha(seminario.det_fecha_fin) }}</h6>
                         <span>Fecha fin</span>
                       </div>
                       <div class="col-4 align-self-center">
-                        <h6>{{ curso.det_hora_ini }}</h6>
+                        <h6>{{ seminario.det_hora_ini }}</h6>
                         <span>Hora inicio</span>
                       </div>
-                      <div class="col-4 align-self-center" v-if="curso.det_carga_horaria">
-                        <h6>{{ curso.det_carga_horaria }} hrs</h6>
+                      <div class="col-4 align-self-center" v-if="seminario.det_carga_horaria">
+                        <h6>{{ seminario.det_carga_horaria }} hrs</h6>
                         <span>Carga horaria</span>
                       </div>
-                      <div class="col-4 align-self-center" v-if="curso.det_cupo_max">
-                        <h6>{{ curso.det_cupo_max }} cupos</h6>
+                      <div class="col-4 align-self-center" v-if="seminario.det_cupo_max">
+                        <h6>{{ seminario.det_cupo_max }} cupos</h6>
                         <span>Cupos disponibles</span>
                       </div>
-                      <div class="col-4 align-self-center" v-if="curso.det_modalidad">
-                        <h6>{{ curso.det_modalidad }}</h6>
+                      <div class="col-4 align-self-center" v-if="seminario.det_modalidad">
+                        <h6>{{ seminario.det_modalidad }}</h6>
                         <span>Modalidad</span>
                       </div>
                     </div>
@@ -96,20 +100,22 @@
                 </div>
               </div>
 
+              <!-- Imagen portada -->
               <div class="thumb">
                 <a 
-                  :href="imageUrl + curso.det_img_portada" 
+                  :href="imageUrl + seminario.det_img_portada" 
                   target="_blank"
                 >
                   <img
-                    :src="imageUrl + curso.det_img_portada"
-                    :alt="curso.det_titulo"
+                    :src="imageUrl + seminario.det_img_portada"
+                    :alt="seminario.det_titulo"
                     style="cursor: zoom-in"
                     loading="lazy"
                   />
                 </a>
               </div>
 
+              <!-- Tabs de navegación -->
               <div class="course-details-nav-tab text-center">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                   <li class="nav-item">
@@ -122,7 +128,7 @@
                       aria-controls="tab1"
                       aria-selected="true"
                     >
-                      <i class="fa fa-book"></i> Descripción del curso
+                      <i class="fa fa-book"></i> Descripción del seminario
                     </a>
                   </li>
                   <li class="nav-item">
@@ -141,7 +147,9 @@
                 </ul>
               </div>
 
+              <!-- Contenido de tabs -->
               <div class="tab-content" id="myTabContent">
+                <!-- Tab 1: Descripción -->
                 <div
                   class="tab-pane fade show active"
                   id="tab1"
@@ -149,20 +157,22 @@
                   aria-labelledby="tab1-tab"
                 >
                   <div class="course-details-content">
-                    <h4 class="title">{{ curso.det_titulo }}</h4>
-                    <p v-html="curso.det_descripcion"></p>
-                    <div v-if="curso.det_lugar_curso" class="mt-4">
+                    <h4 class="title">{{ seminario.det_titulo }}</h4>
+                    <p v-html="seminario.det_descripcion"></p>
+                    <div v-if="seminario.det_lugar_curso" class="mt-4">
                       <b><i class="fa fa-map-marker"></i> Lugar: </b>
-                      {{ curso.det_lugar_curso }}
+                      {{ seminario.det_lugar_curso }}
                     </div>
-                    <div v-if="curso.det_grupo_whatssap" class="mt-2">
+                    <div v-if="seminario.det_grupo_whatssap" class="mt-2">
                       <b><i class="fa fa-whatsapp"></i> Grupo WhatsApp: </b>
-                      <a :href="curso.det_grupo_whatssap" target="_blank">
+                      <a :href="seminario.det_grupo_whatssap" target="_blank">
                         Unirse al grupo
                       </a>
                     </div>
                   </div>
                 </div>
+
+                <!-- Tab 3: Facilitadores -->
                 <div
                   class="tab-pane fade"
                   id="tab3"
@@ -172,7 +182,7 @@
                   <div class="row">
                     <div
                       class="col-md-6"
-                      v-for="(fac, index) of curso.facilitadores"
+                      v-for="(fac, index) of seminario.facilitadores"
                       :key="fac.facilitador_id || index"
                     >
                       <div class="single-team-inner">
@@ -197,7 +207,7 @@
                             <li>
                               <a 
                                 v-if="fac.celular_facilitador"
-                                :href="'https://wa.me/' + fac.celular_facilitador.replace(/[^0-9]/g, '')" 
+                                :href="'https://wa.me/' + fac.celular_facilitador?.toString().replace(/[^0-9]/g, '')" 
                                 target="_blank"
                               >
                                 <i class="fa fa-whatsapp" aria-hidden="true"></i>
@@ -219,13 +229,13 @@
                     </div>
                   </div>
                 </div>
-                
               </div>
             </div>
           </div>
           
         </div>
 
+        <!-- Sidebar -->
         <div class="row justify-content-center mt-5">
           <div class="col-lg-4 col-12">
             <div class="td-sidebar">
@@ -236,7 +246,6 @@
         
       </div>
     </div>
-    
   </div>
 </template>
 
@@ -355,7 +364,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 
 export default {
-  name: "DetalleCurso",
+  name: "DetalleSeminario",
   
   components: { 
     SidebarCustom 
@@ -364,8 +373,7 @@ export default {
   data() {
     return {
       idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
-      curso: {},
-      
+      seminario: {},
       loading: false,
       errorGet: false,
     };
@@ -380,36 +388,36 @@ export default {
   },
 
   methods: {
-    async getCursoOne() {
+    async getSeminarioOne() {
       this.loading = true
       this.errorGet = false
       
       try {
-        const idCur = this.$route.params.idCur
-        
-        // Opción A: Si hay endpoint específico para un curso
-        // const res = await api.get(`/cursos/${idCur}`)
+        const idSem = this.$route.params.idCur
         
         const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
         const data = res.data
         
         const lista = data.cursos || []
-        this.curso = lista.find(c => c.iddetalle_cursos_academicos == idCur) || {}
+        this.seminario = lista.find(c => 
+          c.iddetalle_cursos_academicos == idSem &&
+          c.tipo_curso_otro?.tipo_conv_curso_nombre?.toUpperCase() === 'SEMINARIOS'
+        ) || {}
 
-        if (!this.curso.iddetalle_cursos_academicos) {
+        if (!this.seminario.iddetalle_cursos_academicos) {
           this.errorGet = true
-          console.warn('Curso no encontrado con ID:', idCur)
+          console.warn('Seminario no encontrado con ID:', idSem)
           return
         }
 
-        this.curso = this._limpiarObjeto(this.curso)
+        this.seminario = this._limpiarObjeto(this.seminario)
         
       } catch (error) {
-        console.error('Error cargando curso:', error)
+        console.error('Error cargando seminario:', error)
         this.errorGet = true
 
         if (error.response?.status === 404) {
-          console.warn('Curso no encontrado (404)')
+          console.warn('Seminario no encontrado (404)')
         } else if (error.response?.status === 500) {
           console.error('Error del servidor (500)')
         }
@@ -463,11 +471,11 @@ export default {
 
   created() {
     this.$store.commit("loadOn")
-    this.getCursoOne()
+    this.getSeminarioOne()
   },
 
   beforeUnmount() {
-    this.curso = {}
+    this.seminario = {}
     this.errorGet = false
     this.loading = false
   }

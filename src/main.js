@@ -1,21 +1,61 @@
+// import { createApp } from 'vue'
+// import App from './App.vue'
+// import router from './router'
+// import store from './store'
+// import axios from 'axios'
+// import vueAxios from 'vue-axios'
+
+// import api from './plugins/axios'
+// // import VueSweetalert2 from 'vue-sweetalert2';
+// // import 'sweetalert2/dist/sweetalert2.min.css';
+// // require("dotenv").config({ path: "../ids.env" });
+
+// axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL || 'https://servicioadministrador.upea.bo/api/v2' 
+
+// axios.defaults.headers = {
+//   'Access-Control-Allow-Credentials': true,
+//   'Access-Control-Allow-Origin': '*',
+//   'Access-Control-Allow-Headers': 'application/json',
+//   'Accept': 'application/json',
+//   'content-type': 'application/json',
+//   'Content-Security-Policy': 'frame-ancestors https://serviciopagina.upea.bo'
+// }
+
+// createApp(App).use(store).use(router).use(vueAxios, axios).mount('#app')
+
+
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import axios from 'axios'
-import vueAxios from 'vue-axios'
-// import VueSweetalert2 from 'vue-sweetalert2';
-// import 'sweetalert2/dist/sweetalert2.min.css';
-// require("dotenv").config({ path: "../ids.env" });
 
-axios.defaults.baseURL = process.env.VUE_APP_ROOT_API
-axios.defaults.headers = {
-  'Access-Control-Allow-Credentials': true,
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'application/json',
-  'Accept': 'application/json',
-  'content-type': 'application/json',
-  'Content-Security-Policy': 'frame-ancestors https://serviciopagina.upea.bo'
+import api from './plugins/axios'
+import vueAxios from 'vue-axios'
+
+import axios from 'axios'
+
+axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL || 'https://servicioadministrador.upea.bo/api/v2'
+axios.defaults.headers.common['Accept'] = 'application/json'
+axios.defaults.headers.common['Content-Type'] = 'application/json'
+
+if (process.env.VUE_APP_API_TOKEN) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.VUE_APP_API_TOKEN}`
 }
 
-createApp(App).use(store).use(router).use(vueAxios, axios).mount('#app')
+const app = createApp(App)
+
+app.use(store)
+app.use(router)
+app.use(vueAxios, axios) 
+
+app.config.globalProperties.$api = api
+app.config.globalProperties.$filters = {
+
+  imageUrl: (path) => {
+    if (!path) return ''
+    if (path.startsWith('http')) return path
+    return `${process.env.VUE_APP_UPLOADS_URL || 'https://servicioadministrador.upea.bo/uploads/'}${path}`
+  }
+}
+
+app.mount('#app')
